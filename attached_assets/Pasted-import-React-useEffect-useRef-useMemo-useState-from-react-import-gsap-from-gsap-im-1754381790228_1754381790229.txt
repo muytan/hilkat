@@ -1,0 +1,180 @@
+import React, { useEffect, useRef, useMemo, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+/* --------------------------------------------------
+   ScrollReveal – Netleşen kelimeler animasyonu
+--------------------------------------------------- */
+const ScrollReveal = ({
+  children,
+  enableBlur = true,
+  baseOpacity = 0.1,
+  baseRotation = 3,
+  blurStrength = 8,
+  rotationEnd = '+=300%',
+  wordAnimationEnd = '+=300%',
+}) => {
+  const containerRef = useRef(null);
+
+  // Global font + stil tek sefer eklenir
+  useEffect(() => {
+    if (!document.getElementById('scroll-reveal-style')) {
+      const style = document.createElement('style');
+      style.id = 'scroll-reveal-style';
+      style.innerHTML = `
+        @import url('https://fonts.googleapis.com/css2?family=Spectral+SC:wght@700&family=Merriweather:wght@400;700&display=swap');
+        .scroll-reveal-text .word{display:inline-block;white-space:pre}
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  // Çocuk metni kelimelere ayır
+  const splitText = useMemo(() => {
+    const text = typeof children === 'string' ? children : '';
+    return text.split(/(\s+)/).map((word, idx) => {
+      if (word.match(/^\s+$/)) return word;
+      return <span className="word" key={idx}>{word}</span>;
+    });
+  }, [children]);
+
+  // Animasyonlar
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    gsap.fromTo(
+      el,
+      { rotate: baseRotation, transformOrigin: '0% 50%' },
+      {
+        rotate: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: rotationEnd, scrub: true },
+      }
+    );
+
+    const words = el.querySelectorAll('.word');
+
+    gsap.fromTo(
+      words,
+      { opacity: baseOpacity },
+      {
+        opacity: 1,
+        stagger: 0.08,
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom-=20%', end: wordAnimationEnd, scrub: true },
+      }
+    );
+
+    if (enableBlur) {
+      gsap.fromTo(
+        words,
+        { filter: `blur(${blurStrength}px)` },
+        {
+          filter: 'blur(0px)',
+          stagger: 0.08,
+          ease: 'none',
+          scrollTrigger: { trigger: el, start: 'top bottom-=20%', end: wordAnimationEnd, scrub: true },
+        }
+      );
+    }
+
+    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
+  }, [enableBlur, baseRotation, baseOpacity, blurStrength, rotationEnd, wordAnimationEnd]);
+
+  return (
+    <h2 ref={containerRef} className="scroll-reveal py-8 text-2xl leading-relaxed font-['Merriweather']">
+      <p className="scroll-reveal-text">{splitText}</p>
+    </h2>
+  );
+};
+
+/* --------------------------------------------------
+   Story – Google Docs veya yedek metinden hikâye
+--------------------------------------------------- */
+const Story = ({ docId, fallbackText }) => {
+  const [content, setContent] = useState('');
+  const [preview, setPreview] = useState('');
+  const [expanded, setExpanded] = useState(false);
+
+  const hasDoc = docId && docId !== 'PASTE_YOUR_DOC_ID_HERE';
+
+  useEffect(() => {
+    if (!hasDoc) {
+      setContent(fallbackText);
+      const firstLines = fallbackText.split('\n').filter(Boolean).slice(0, 2).join(' ');
+      setPreview(firstLines);
+      return;
+    }
+
+    fetch(`https://docs.google.com/document/d/${docId}/export?format=txt`)
+      .then((r) => r.text())
+      .then((txt) => {
+        setContent(txt);
+        const firstLines = txt.split('\n').filter(Boolean).slice(0, 2).join(' ');
+        setPreview(firstLines);
+      })
+      .catch(() => {
+        setContent('Hikâye yüklenemedi.');
+        setPreview('Hikâye yüklenemedi.');
+      });
+  }, [docId, hasDoc, fallbackText]);
+
+  return (
+    <div className="mb-16">
+      {expanded ? (
+        <article className="whitespace-pre-wrap leading-relaxed font-['Merriweather']">
+          {content}
+        </article>
+      ) : (
+        <>
+          <ScrollReveal>{preview + '...'}</ScrollReveal>
+          <button
+            onClick={() => setExpanded(true)}
+            className="underline mt-4 hover:opacity-80 transition-opacity duration-200"
+          >
+            Hikâyenin tamamını oku →
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
+
+/* --------------------------------------------------
+   Ana Sayfa
+--------------------------------------------------- */
+const App = () => {
+  const exampleDocId = 'PASTE_YOUR_DOC_ID_HERE';
+  const defaultStory = `Bir gece yarısı, rüzgârın uğultusu arasında eski köşkün kapısı kendiliğinden aralandı.\nİçeriden gelen soğuk esinti, paslı avizedeki mumları titretti ve gölgeler duvarlarda dans etmeye başladı.`;
+
+  return (
+    <div className="bg-black text-white min-h-screen font-['Merriweather']">
+      {/* Başlık */}
+      <header className="min-h-screen flex flex-col items-center justify-center text-center px-6">
+        <h1 className="text-5xl md:text-7xl tracking-widest uppercase font-['Spectral_SC']">
+          Hilkat Garibesi
+        </h1>
+        <p className="mt-4 text-lg opacity-70">Korku Hikâyeleri</p>
+        <svg
+          className="w-6 h-6 mt-20 animate-bounce opacity-60"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </header>
+
+      {/* Hikâye */}
+      <main className="max-w-3xl mx-auto px-6 md:px-0 pb-40">
+        <Story docId={exampleDocId} fallbackText={defaultStory} />
+      </main>
+    </div>
+  );
+};
+
+export default App;

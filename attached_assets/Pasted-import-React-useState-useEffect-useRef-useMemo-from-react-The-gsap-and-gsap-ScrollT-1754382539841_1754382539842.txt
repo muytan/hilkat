@@ -1,0 +1,226 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+// The 'gsap' and 'gsap/ScrollTrigger' libraries are now loaded via CDN script tags
+// to avoid the 'Could not resolve' error during compilation.
+// import { gsap } from 'gsap';
+// import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// ScrollReveal bileşeni, metnin kaydırıldıkça görünür hale gelmesini sağlar.
+// Bu, kullanıcı tarafından sağlanan kodun biraz düzenlenmiş halidir.
+const ScrollReveal = ({
+  children,
+  scrollContainerRef,
+  enableBlur = true,
+  baseOpacity = 0.1,
+  baseRotation = 3,
+  blurStrength = 4,
+  containerClassName = "",
+  textClassName = "",
+  rotationEnd = "bottom bottom",
+  wordAnimationEnd = "bottom bottom"
+}) => {
+  const containerRef = useRef(null);
+
+  // Metni kelimelere bölerek her bir kelimeye animasyon eklemek için kullanılıyor.
+  const splitText = useMemo(() => {
+    const text = typeof children === 'string' ? children : '';
+    return text.split(/(\s+)/).map((word, index) => {
+      // Sadece kelimelere 'word' sınıfı ekliyoruz, boşluklara değil.
+      if (word.match(/^\s+$/)) return word;
+      return (
+        <span className="word inline-block" key={index}>
+          {word}
+        </span>
+      );
+    });
+  }, [children]);
+
+  useEffect(() => {
+    // Check if gsap is available before using it
+    if (typeof window.gsap !== 'undefined') {
+      // Register ScrollTrigger plugin after GSAP is loaded
+      gsap.registerPlugin(ScrollTrigger);
+    } else {
+      console.error("GSAP is not loaded. Scroll animations will not work.");
+      return;
+    }
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    // Animasyonun tetikleneceği kaydırma konteyneri
+    const scroller =
+      scrollContainerRef && scrollContainerRef.current
+        ? scrollContainerRef.current
+        : window;
+
+    // Metnin tamamı için dönüş animasyonu
+    gsap.fromTo(
+      el,
+      { transformOrigin: '0% 50%', rotate: baseRotation },
+      {
+        ease: 'none',
+        rotate: 0,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom',
+          end: rotationEnd,
+          scrub: true,
+        },
+      }
+    );
+
+    const wordElements = el.querySelectorAll('.word');
+
+    // Kelimeler için solma animasyonu (opasite artışı)
+    gsap.fromTo(
+      wordElements,
+      { opacity: baseOpacity, willChange: 'opacity' },
+      {
+        ease: 'none',
+        opacity: 1,
+        stagger: 0.05,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom-=20%',
+          end: wordAnimationEnd,
+          scrub: true,
+        },
+      }
+    );
+
+    // İsteğe bağlı olarak bulanıklaşma animasyonu
+    if (enableBlur) {
+      gsap.fromTo(
+        wordElements,
+        { filter: `blur(${blurStrength}px)` },
+        {
+          ease: 'none',
+          filter: 'blur(0px)',
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: el,
+            scroller,
+            start: 'top bottom-=20%',
+            end: wordAnimationEnd,
+            scrub: true,
+          },
+        }
+      );
+    }
+
+    // Bileşen ayrıldığında tüm ScrollTrigger'ları temizle
+    return () => {
+      if (typeof window.ScrollTrigger !== 'undefined') {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      }
+    };
+  }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
+
+  return (
+    <h2 ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
+      <p className={`scroll-reveal-text ${textClassName}`}>{splitText}</p>
+    </h2>
+  );
+};
+
+// Hikaye bileşeni, her bir hikaye için başlığı, giriş metnini ve tam metni gösterir.
+const Story = ({ title, intro, fullText }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Buton tıklandığında metni genişletip daraltmak için state'i günceller.
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <div className="story-container mb-12 p-6 bg-stone-900 rounded-lg shadow-2xl transition-all duration-500 hover:shadow-red-900/50">
+      <h3 className="text-3xl font-serif text-red-500 mb-4">{title}</h3>
+      {/* ScrollReveal bileşenini kullanarak hikayenin girişini veya tam metnini animasyonlu gösteririz. */}
+      <ScrollReveal
+        baseOpacity={0.05}
+        baseRotation={5}
+        blurStrength={2}
+        containerClassName="text-white font-sans"
+        textClassName="text-xl leading-relaxed"
+      >
+        {isExpanded ? fullText : intro}
+      </ScrollReveal>
+      <button
+        onClick={toggleExpand}
+        className="mt-4 px-6 py-2 bg-stone-800 text-red-400 font-bold rounded-full border border-red-400 transition-all duration-300 hover:bg-red-400 hover:text-stone-900 hover:scale-105"
+      >
+        {isExpanded ? 'Gizle' : 'Devamını Oku'}
+      </button>
+    </div>
+  );
+};
+
+// Ana uygulama bileşeni
+const App = () => {
+  // Demo için Türkçe korku hikayeleri verisi
+  const horrorStories = [
+    {
+      title: "Gece Gelen Fısıltı",
+      intro: "Sessiz bir geceydi, rüzgar bile yaprakları sallamıyordu. Oysa odamın en kuytu köşesinden, ismimi fısıldayan bir ses geliyordu. Sesin sahibi görünmüyordu ama varlığını her bir hücremle hissediyordum.",
+      fullText: "Sessiz bir geceydi, rüzgar bile yaprakları sallamıyordu. Oysa odamın en kuytu köşesinden, ismimi fısıldayan bir ses geliyordu. Sesin sahibi görünmüyordu ama varlığını her bir hücremle hissediyordum. Yorganımın altına gizlendim, gözlerimi sımsıkı kapattım. Ses daha da yaklaştı, şimdi kulağımın dibindeydi. 'Korkma,' dedi, 'yalnız değilsin...' Ne yazık ki, o haklıydı. O günden sonra, bir daha asla yalnız kalamadım."
+    },
+    {
+      title: "Aynadaki Yabancı",
+      intro: "Eski bir antikacıdan aldığım aynanın tuhaf bir enerjisi vardı. Ona her baktığımda, yansımamın bana yabancı birinin gözleriyle baktığını fark ediyordum. Sanki ruhumun yerine başka bir varlık geçmişti.",
+      fullText: "Eski bir antikacıdan aldığım aynanın tuhaf bir enerjisi vardı. Ona her baktığımda, yansımamın bana yabancı birinin gözleriyle baktığını fark ediyordum. Sanki ruhumun yerine başka bir varlık geçmişti. Başlarda bunu sadece yorgunluğa yordum. Fakat zamanla, o yabancı yansıma kendi başına hareket etmeye başladı. Ben gülünce o ağlıyordu, ben uyuyunca o uyanıyordu. Artık aynaya bakmaya korkuyordum, çünkü biliyordum ki, bir gün o yansıma beni dışarıdan izlerken, ben aynanın içinde hapsolacaktım."
+    },
+    {
+      title: "Köyün Laneti",
+      intro: "Issız bir köyde, terk edilmiş bir evde kalıyorduk. Geceleri tavan arasında, her zaman aynı saatte, tahta zeminin gıcırtısı duyulurdu. Köylüler, bu sesin yüzyıllar önce kaybolan bir çocuğa ait olduğunu söylerdi.",
+      fullText: "Issız bir köyde, terk edilmiş bir evde kalıyorduk. Geceleri tavan arasında, her zaman aynı saatte, tahta zeminin gıcırtısı duyulurdu. Köylüler, bu sesin yüzyıllar önce kaybolan bir çocuğa ait olduğunu söylerdi. İlk başta buna gülüp geçtik, ama bir gece o gıcırtılar yavaş yavaş merdivenlerden inmeye başladı. Ardından kapımızın önünde durdu. Kilitli kapı bir anda açıldı ve içeriye, yüzü görünmeyen küçük bir gölge girdi. O gölge, kaybolan çocuktu ve bizden onunla oynamamızı istiyordu. Sonsuza dek."
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-black text-gray-200 font-sans p-4 antialiased">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+        h1, h3 { font-family: 'Playfair Display', serif; }
+        body { font-family: 'Inter', sans-serif; }
+        .word {
+          display: inline-block;
+          white-space: nowrap;
+        }
+      `}</style>
+      {/* Tailwind CSS CDN */}
+      <script src="https://cdn.tailwindcss.com"></script>
+      {/* GSAP ve ScrollTrigger CDN'leri */}
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+      <header className="relative h-screen flex flex-col justify-center items-center text-center">
+        <h1 className="text-7xl md:text-9xl font-bold text-red-700 tracking-widest uppercase animate-pulse">
+          Hilkat Garibesi
+        </h1>
+        <p className="mt-4 text-2xl text-stone-400 max-w-2xl px-4 italic">
+          Karanlığın Fısıltıları, Gecenin Sırları...
+        </p>
+      </header>
+
+      <main className="container mx-auto max-w-4xl px-4 mt-20">
+        {horrorStories.map((story, index) => (
+          <Story
+            key={index}
+            title={story.title}
+            intro={story.intro}
+            fullText={story.fullText}
+          />
+        ))}
+      </main>
+
+      <footer className="text-center py-10 text-stone-600 text-sm">
+        <p>&copy; 2025 Hilkat Garibesi. Tüm hakları saklıdır.</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
+
