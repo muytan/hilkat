@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HİLKAT GARİBESİ</title>
+<meta name="description" content="Karanlığın içinden modern, minimalist korku hikâyeleri." />
+
+<!-- Core families -->
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Instrument+Serif:ital@0;1&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
+
+<!-- Rubik display variants -->
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=Rubik+Bubbles&family=Rubik+Moonrocks&family=Rubik+Dirt&family=Rubik+Doodle+Shadow&family=Rubik+Iso&family=Rubik+Wet+Paint&family=Rubik+Distressed&family=Rubik+Gemstones&family=Rubik+Beastly&family=Rubik+Puddles&family=Rubik+Microbe&family=Rubik+80s+Fade&family=Rubik+Marker+Hatch&family=Rubik+Pixels&family=Rubik+Storm&family=Rubik+Maze&display=swap" rel="stylesheet">
+
+<!-- Non-Rubik contrast fonts (subtitle rotation kept exactly as before) -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime:wght@400;700&family=Oswald:wght@500&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#000; --panel:#070707; --fg:#e9e9e9;
+  --red:#8F0D14; --red-dark:#56070A;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Rubik,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.container{max-width:1000px;margin:0 auto;padding:0 20px}
+
+/* Variable font for title */
+@font-face{
+  font-family:"Compressa VF";
+  src:url("https://res.cloudinary.com/dr6lvwubh/raw/upload/v1529908256/CompressaPRO-GX.woff2") format("woff2");
+  font-style:normal; font-weight:100 900; font-stretch:50% 200%;
+}
+
+/* HERO */
+.hero{
+  position:relative; overflow:hidden; isolation:isolate;
+  background: radial-gradient(1200px 600px at var(--mx,50%) var(--my,50%), #150202 0%, #0a0a0a 45%, #040404 70%, #000 100%);
+  border-bottom:1px solid #0b0b0b;
+}
+.hero-inner{min-height:70svh; display:grid; place-items:center; padding:50px 0 24px}
+.tp-wrap{position:relative; width:min(92vw,960px); height:clamp(120px,26vw,240px); margin:0 auto;}
+.tp-title{
+  position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center;
+  margin:0; padding:0 6px; text-transform:uppercase; white-space:nowrap; line-height:1;
+  font-family:"Compressa VF",system-ui,sans-serif; color:#fff;
+}
+.tp-title span{display:inline-block; position:relative; color:#fff}
+.tp-title.stroke span::after{
+  content:attr(data-char); position:absolute; left:0; top:0; z-index:-1; color:transparent;
+  -webkit-text-stroke-width:3px; -webkit-text-stroke-color:var(--red);
+}
+
+/* Subtitle (meaning) — vertical stack with rotating fonts (unchanged) */
+.meaning{margin-top:6px; transform:translateY(-6px); color:#e6e6e6; opacity:.34; font-size:clamp(14px,2.8vw,18px); text-align:center; letter-spacing:.02em}
+.meaning-stack{display:flex; flex-direction:column; align-items:center; gap:2px}
+.mword{display:block; line-height:1.2; transition:opacity .12s ease, transform .12s ease, filter .12s ease}
+
+.hr-red{height:1px;background:linear-gradient(90deg,transparent,var(--red) 40%,transparent);margin:16px 0 28px;border:0}
+.weekly{font-family:"Instrument Serif",Georgia,serif; font-size:clamp(22px,3vw,28px); letter-spacing:.04em; text-align:center; margin:26px 0 8px}
+
+/* STORY + reveal */
+.syne{font-family:"Syne",sans-serif; font-weight:800}
+.card{border:1px solid #0e0e0e; background:var(--panel); border-radius:16px; padding:22px}
+.story-title{margin:0 0 14px; text-align:center; font-size:clamp(32px,5vw,44px); letter-spacing:.005em; color:#f0f0f0}
+.title-word{display:inline-block; filter:blur(8px); opacity:0; transform:translateY(-10px)}
+.title-animate .title-word{animation:titleIn .7s cubic-bezier(.2,.6,.2,1) forwards}
+@keyframes titleIn{to{filter:blur(0); opacity:1; transform:translateY(0)}}
+.sr-text{font-size:clamp(1.06rem,3.2vw,1.46rem); line-height:1.75; letter-spacing:.01em; color:#e6e6e6}
+.sr-text .word{display:inline-block; margin-right:.25ch}
+.scroll-spacer{height:30vh}
+
+/* Button */
+.btn{--outline:var(--red-dark); display:inline-flex; align-items:center; justify-content:center; padding:12px 22px; border-radius:12px; border:2px solid var(--outline); background:transparent; text-decoration:none; text-align:center; margin-top:26px; transition:border-color .2s ease, box-shadow .2s ease}
+.btn:hover{border-color:var(--red)}
+.btn:focus-visible{outline:none; box-shadow:0 0 0 3px #000, 0 0 0 6px rgba(143,13,20,.45)}
+.glow-text{color:#e2e2e2; font-weight:800; letter-spacing:.06em; display:inline-block; animation:glowPulse 2.4s ease-in-out infinite}
+@keyframes glowPulse{
+  0%,55%{text-shadow:0 0 0 rgba(255,255,255,0); transform:scale(1)}
+  62%{text-shadow:0 0 10px rgba(255,255,255,.35),0 0 22px rgba(255,255,255,.18); transform:scale(1.01)}
+  72%{text-shadow:0 0 16px rgba(255,255,255,.6),0 0 34px rgba(255,255,255,.35),0 0 52px rgba(255,255,255,.2); transform:scale(1.02)}
+  100%{text-shadow:0 0 0 rgba(255,255,255,0); transform:scale(1)}
+}
+
+footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="container hero-inner">
+    <div class="tp-wrap" id="tpContainer" aria-label="HİLKAT GARİBESİ">
+      <h1 class="tp-title stroke" id="tpTitle"></h1>
+    </div>
+    <div class="meaning">
+      <div class="meaning-stack" id="meaningStack">Kendisinde doğuştan normal olmayan gariplikler bulunan kimse</div>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+  <div class="hr-red"></div>
+
+  <h2 class="weekly">BU HAFTANIN HİKÂYESİ</h2>
+
+  <article class="card" aria-label="Hikâye">
+    <h3 class="story-title syne" id="storyTitle"></h3>
+
+    <p class="sr-text">“Sayın Yargıç Erkan Cantay!”. Yargıç içeri girdiğinde herkes ayağa kalktı… ‘o’ dışında. Avukatı dürttüğünde ayağa kalkmaya yeltendi ancak yargıç çoktan oturmuştu.</p>
+    <p class="sr-text">Bir süre sessizlikten sonra herkes yargıcın tiksinmiş suratına odaklanmıştı.</p>
+    <p class="sr-text">Sanığa bakıyordu, bu kadar nefreti belki de hayatı boyunca hissetmemişti.</p>
+    <p class="sr-text">Kızına ne kadar sevgi duyuyorsa ve kızı için nasıl her şeyi yapabilecekse; karşındaki seri katile de o kadar büyük ve derin bir nefret duyuyordu.</p>
+
+    <a class="btn" href="#top"><span class="glow-text">DEVAMINI OKU</span></a>
+  </article>
+
+  <div class="scroll-spacer"></div>
+
+  <footer>© 2025 tan</footer>
+</main>
+
+<!-- GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<script>
+/* Title spans + desktop pointer-pressure; mobile uses decrypt effect */
+(function(){
+  const TITLE_TEXT = "HİLKAT GARİBESİ";
+  const container = document.getElementById('tpContainer');
+  const title = document.getElementById('tpTitle');
+  title.textContent = "";
+  const chars = [...TITLE_TEXT];
+
+  // build spans
+  chars.forEach((ch,i)=>{
+    const s=document.createElement('span');
+    s.dataset.char=ch; s.textContent=ch;
+    s.style.setProperty('--d', i);
+    title.appendChild(s);
+  });
+
+  // size
+  function setSize(){
+    const {width} = container.getBoundingClientRect();
+    let fz = width / (chars.length / 2);
+    title.style.fontSize = Math.max(fz, 24) + 'px';
+    title.style.lineHeight = 1;
+  }
+  addEventListener('resize', setSize, {passive:true}); setSize();
+
+  const isMobile = matchMedia('(pointer: coarse), (max-width: 640px)').matches;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (isMobile && !reduceMotion) {
+    // MOBILE: Decrypt/Scramble reveal (no hover, auto on view)
+    const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};:,.<>?/\\|~`░▒▓█▌▐#¤¢£¥§¶†‡∆ΩΨΣΦΘΞΛζψøæπµ";
+    const spans = Array.from(title.querySelectorAll('span'));
+    let revealed = new Set();
+    let iter = 0;
+    const maxIterations = 120;
+    const speed = 130; // ms
+    const sequential = true;
+    const revealDirection = "center"; // start | end | center
+
+    function nextIndex(set){
+      const n = spans.length;
+      if (revealDirection === "start") return set.size;
+      if (revealDirection === "end") return n - 1 - set.size;
+      // center
+      const mid = Math.floor(n/2);
+      const off = Math.floor(set.size/2);
+      const idx = set.size % 2 === 0 ? mid + off : mid - off - 1;
+      if (idx >= 0 && idx < n && !set.has(idx)) return idx;
+      for (let i=0;i<n;i++) if (!set.has(i)) return i;
+      return 0;
+    }
+
+    function tick(){
+      if (sequential) {
+        if (revealed.size < spans.length) {
+          const ni = nextIndex(revealed);
+          revealed.add(ni);
+        } else {
+          clearInterval(timer);
+          // ensure original text at end
+          spans.forEach((sp,i)=>{ sp.textContent = chars[i]; });
+          return;
+        }
+        // scramble unrevealed
+        spans.forEach((sp,i)=>{
+          if (chars[i] === " ") return;
+          if (revealed.has(i)) sp.textContent = chars[i];
+          else sp.textContent = LETTERS[Math.floor(Math.random()*LETTERS.length)];
+        });
+      } else {
+        // non-sequential flicker mode
+        if (iter++ >= maxIterations) {
+          clearInterval(timer);
+          spans.forEach((sp,i)=> sp.textContent = chars[i]);
+          return;
+        }
+        spans.forEach((sp,i)=>{
+          if (chars[i] === " ") return;
+          sp.textContent = LETTERS[Math.floor(Math.random()*LETTERS.length)];
+        });
+      }
+    }
+
+    // Run when hero enters view once
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if (en.isIntersecting){
+          timer = setInterval(tick, speed);
+          io.disconnect();
+        }
+      });
+    }, {threshold:0.2});
+    let timer;
+    io.observe(container);
+
+  } else {
+    // DESKTOP: interactive pressure
+    const mouse={x:0,y:0}, cursor={x:0,y:0};
+    addEventListener('mousemove', e=>{cursor.x=e.clientX;cursor.y=e.clientY},{passive:true});
+    addEventListener('touchmove', e=>{const t=e.touches[0];cursor.x=t.clientX;cursor.y=t.clientY},{passive:true});
+    (function seed(){const r=container.getBoundingClientRect(); mouse.x=cursor.x=r.left+r.width/2; mouse.y=cursor.y=r.top+r.height/2;})();
+    function loop(){
+      mouse.x+=(cursor.x-mouse.x)/14; mouse.y+=(cursor.y-mouse.y)/14;
+      const rect = title.getBoundingClientRect(), max = rect.width/2||1;
+      title.querySelectorAll('span').forEach(sp=>{
+        const r=sp.getBoundingClientRect(), cx=r.x+r.width/2, cy=r.y+r.height/2;
+        const d=Math.hypot(mouse.x-cx, mouse.y-cy);
+        const map=(dist,minv,maxv)=>Math.max(minv,(maxv - (maxv*dist)/max) + minv);
+        sp.style.fontVariationSettings = `'wght' ${Math.floor(map(d,200,900))}, 'wdth' ${Math.floor(map(d,80,150))}, 'ital' ${map(d,0,.2).toFixed(2)}`;
+      });
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+})();
+
+/* Story title entrance (unchanged) */
+(function(){
+  const el=document.getElementById('storyTitle'), text="BİZİ KÖTÜDEN KORU", words=text.split(' ');
+  el.innerHTML=words.map((w,i)=>`<span class="title-word" style="animation-delay:${i*140}ms">${w}${i<words.length-1?'&nbsp;':''}</span>`).join('');
+  let played=false; const play=()=>{if(played)return; played=true; el.classList.add('title-animate');};
+  const t=setTimeout(play,3000); window.addEventListener('scroll',()=>{clearTimeout(t); play();},{once:true,passive:true});
+})();
+
+/* Scroll-to-reveal words (unchanged) */
+(function(){
+  gsap.registerPlugin(ScrollTrigger);
+  function splitWords(node){
+    const words=node.textContent.split(' ').filter(Boolean);
+    node.textContent='';
+    words.forEach(w=>{const s=document.createElement('span'); s.className='word'; s.textContent=w; node.appendChild(s);});
+    return node.querySelectorAll('.word');
+  }
+  document.querySelectorAll('.sr-text').forEach(para=>{
+    const words=splitWords(para);
+    gsap.fromTo(para,{rotate:3,transformOrigin:'0% 50%'},{rotate:0,ease:'none',scrollTrigger:{trigger:para,start:'top 95%',end:'bottom top',scrub:true}});
+    const cfg={trigger:para,start:'top 90%',end:'bottom 30%',scrub:true};
+    gsap.fromTo(words,{opacity:.12},{opacity:1,ease:'none',stagger:0.02,scrollTrigger:cfg});
+    gsap.fromTo(words,{filter:'blur(8px)'},{filter:'blur(0px)',ease:'none',stagger:0.02,scrollTrigger:cfg});
+  });
+})();
+
+/* Meaning rotation (unchanged, jitter-free) */
+(async function(){
+  const FONTS = [
+    '"Rubik Glitch", cursive',
+    '"Playfair Display", serif',
+    '"Rubik Bubbles", cursive',
+    '"Courier Prime", monospace',
+    '"Rubik Dirt", cursive',
+    '"Oswald", sans-serif',
+    '"Rubik Iso", cursive',
+    '"Cinzel", serif',
+    '"Rubik Wet Paint", cursive',
+    '"Rubik Pixels", cursive',
+    '"Rubik Maze", cursive',
+    '"Rubik Marker Hatch", cursive',
+    '"Rubik 80s Fade", cursive',
+    '"Rubik Mono One", sans-serif',
+    '"Rubik Distressed", cursive',
+    '"Rubik Gemstones", cursive',
+    '"Rubik Beastly", cursive',
+    '"Rubik Puddles", cursive',
+    '"Rubik Microbe", cursive',
+    '"Rubik Moonrocks", cursive',
+    '"Rubik", sans-serif'
+  ];
+
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(_){} }
+
+  const stack = document.getElementById('meaningStack');
+  const words = stack.textContent.trim().split(' ').filter(Boolean);
+  stack.innerHTML = words.map(w=>`<span class="mword">${w}</span>`).join('');
+
+  const els = Array.from(stack.querySelectorAll('.mword'));
+  const meas = document.createElement('span');
+  meas.style.position='absolute'; meas.style.left='-9999px'; meas.style.top='-9999px'; meas.style.visibility='hidden';
+  document.body.appendChild(meas);
+
+  els.forEach(el=>{
+    const word = el.textContent;
+    let maxW = 0, maxH = 0;
+    FONTS.forEach(ff=>{
+      meas.style.fontFamily = ff;
+      meas.style.fontSize = getComputedStyle(stack).fontSize;
+      meas.style.lineHeight = '1.2';
+      meas.textContent = word;
+      const r = meas.getBoundingClientRect();
+      if (r.width > maxW)  maxW = r.width;
+      if (r.height > maxH) maxH = r.height;
+    });
+    el.style.display = 'inline-block';
+    el.style.width  = Math.ceil(maxW) + 'px';
+    el.style.height = Math.ceil(maxH) + 'px';
+    el.style.lineHeight = Math.ceil(maxH) + 'px';
+    el.style.fontFamily = FONTS[0];
+  });
+  meas.remove();
+
+  let i = 0;
+  function tick(){
+    i = (i + 1) % FONTS.length;
+    els.forEach((el, idx)=>{
+      setTimeout(()=>{
+        el.style.opacity = .5; el.style.transform='translateY(-2px)'; el.style.filter='blur(2px)';
+        setTimeout(()=>{ el.style.fontFamily = FONTS[i]; el.style.opacity=''; el.style.transform=''; el.style.filter=''; }, 120);
+      }, idx * 80);
+    });
+  }
+  setTimeout(tick, 1200);
+  setInterval(tick, 2000);
+})();
+</script>
+</body>
+</html>
