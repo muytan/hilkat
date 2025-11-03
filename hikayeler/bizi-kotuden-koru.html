@@ -63,11 +63,33 @@ p { margin: 12px 0; }
 }
 .media-player.active { display: block; }
 
-audio, video {
+.dark-audio {
+  width: 100%;
+  height: 60px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  border: 2px solid var(--red);
+  box-shadow: 0 0 15px rgba(163,0,0,0.3);
+}
+audio::-webkit-media-controls-panel {
+  background: #111;
+  color: #fff;
+}
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-timeline,
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  filter: invert(1);
+}
+
+video {
   width: 100%;
   outline: none;
   border-radius: 10px;
   background: #111;
+  border: 2px solid var(--red);
+  box-shadow: 0 0 15px rgba(163,0,0,0.3);
 }
 
 footer {
@@ -82,20 +104,38 @@ footer {
 
 <h1 class="story-title">BİZİ KÖTÜDEN KORU</h1>
 
-<p>“Sayın Yargıç Erkan Cantay!”. Yargıç içeri girdiğinde herkes ayağa kalktı… ‘o’ dışında. Avukatı dürttüğünde ayağa kalkmaya yeltendi ancak yargıç çoktan oturmuştu.</p>
-<p>Bir süre sessizlikten sonra herkes yargıcın tiksinmiş suratına odaklanmıştı. Sanığa bakıyordu; bu kadar nefreti belki de hayatı boyunca hissetmemişti.</p>
-<p>Kızına ne kadar sevgi duyuyorsa ve kızı için nasıl her şeyi yapabilecekse; karşındaki seri katile de o kadar büyük ve derin bir nefret duyuyordu. Ön yargılı görüşlerini bir kenara koymaya çalışarak ilk sözlerini söyledi: “Evet, başlayalım…”</p>
-<p>Yargıç, suçlamaları sıralarken salonun havası gittikçe ağırlaşıyordu. Katil sessizce dinliyor, bazen hafifçe gülümsüyordu. Yargıcın sesi titrediğinde aniden konuştu: “Kızınız hâlâ o kırmızı paltosunu giyiyor mu?” Salon buz kesti. Bu detayı yalnızca o ve kızı biliyordu.</p>
-<p>Yargıç ayağa fırladı. “Herkes dışarı!” diye bağırdı. Kapılar kapandı. Sadece ikisi kaldı. Katil, dudaklarının arasından karanlık, siyah bir dil uzattı — insan dışı bir şeydi bu. Gözleri yargıcın üzerine kilitlendi: “Beni sen çağırdın,” dedi. “Ve şimdi, kızını benden koru.”</p>
+<p>“Sayın Yargıç Erkan Cantay!” Yargıç içeri girdiğinde herkes ayağa kalktı. Bir tek o kalkmadı. Avukatı dirseğiyle dürttü ama adam kıpırdamadı, başını hafifçe yana eğdi. Yargıç gözlüğünün üzerinden baktı, sesini yükseltti.</p>
+<p>“Sanık ayağa kalksın.”</p>
+<p>Adam yavaşça başını kaldırdı. Gözleri donuktu, boş bir derinliğe bakar gibiydi. Bir uğultu yayıldı salondan. Kimse bir şey söylemedi, ama herkesin içinde aynı rahatsızlık vardı. Yargıç istemsizce yutkundu.</p>
+<p>“Dosyada yüzlerce sayfa var, ama hiçbirinde neden yaptığını yazmıyor,” dedi. “Anlat bakalım, neden?”</p>
+<p>Adam başını yana eğdi, dudaklarının kenarı belli belirsiz kıvrıldı. “Kızınızın gözleri de böyleydi.”</p>
+<p>Yargıç yerinde dondu. Salondaki hava bir anda ağırlaştı. Kalemi elinden düştü, tok bir sesle masaya çarptı. “Ne dedin sen?”</p>
+<p>Adam başını kaldırdı. “Elif. Öyle demişti. Bizi kötüden koru.”</p>
+<p>Bir uğultu daha geçti, ama bu kez dışarıdan değil içeriden geliyordu, sanki binanın duvarları nefes alıyordu. Yargıç yerinden kalktı. “Duruşmaya ara veriyorum. Herkes dışarı.”</p>
+<p>Kapılar kapandı. Salonda sadece ikisi kaldı.</p>
+<p>Yargıç derin bir nefes aldı. “Kızımı nereden tanıyorsun?”</p>
+<p>Adam gözlerini ona dikti. “Tanımıyorum. Ama o beni çağırdı.”</p>
+<p>Yargıç bir adım geri çekildi. “Ne saçmalıyorsun sen?”</p>
+<p>Adamın yüzündeki gülümseme genişledi. “Her gece dua ediyordu. Sizi de duyuyordum. Siz unuttunuz ama o unutmadı.”</p>
+<p>Işıklar titredi, sonra söndü. Karanlıkta zincirlerin sesi yankılandı. Yargıç telefonunu çıkardı, el fenerini açmak istedi. Ekranda bir mesaj belirdi:</p>
+<p><em>Elif: “Baba, merak etme. Eve geldim.”</em></p>
+<p>Tam o anda karşısındaki adam doğruldu. Zincirleri yere düşmüştü. Yavaşça dilini dışarı çıkardı; siyah, ıslak, canlı bir şeydi o. “Endişelenmeyin Yargıç. Kızınız artık korkmuyor.”</p>
+<p>Yargıç geri çekilmek istedi, ama dizleri titredi. “Ne yaptın ona?”</p>
+<p>“Ben değil,” dedi adam. “Siz yaptınız. O beni çağırdı, ben sadece geldim.”</p>
+<p>O sırada mahkeme salonunun kapısı arkasından bir ses duyuldu. Tırnak sesi gibi, yavaş yavaş yaklaşan bir sürünme. Yargıç gözlerini kapıya dikti. Kapının altından sızan bir gölge büyüdü, büyüdü, sonunda ayağa kalktı.</p>
+<p>Elif’in sesi duyuldu, kısık ama tanıdık. “Baba, dua etmeyi neden bıraktın?”</p>
+<p>Kapı aralandı. Hiç kimse yoktu. Sadece içeri dolan rüzgârla, duvarın üzerine yazılmış bir cümle belirdi:</p>
+<p><strong>Bizi kötüden koru.</strong></p>
+<p>Ve Yargıç o an fark etti. Telefon hâlâ elindeydi. Ama ekranında kendi sesi yankılanıyordu. “Elif…” dedi titreyerek. Fısıltı cevabı verdi:</p>
+<p><em>“Artık ben koruyorum.”</em></p>
 
 <div class="media-actions">
   <button id="btnListen" class="media-btn">Hikâyeyi Dinle</button>
   <button id="btnWatch" class="media-btn">Hikâyeyi İzle</button>
-  <a class="media-btn" href="/media/bizi-kotuden-koru.MP3" download>MP3 İndir</a>
 </div>
 
 <div id="playerAudio" class="media-player">
-  <audio controls preload="metadata">
+  <audio class="dark-audio" controls preload="metadata">
     <source src="/media/bizi-kotuden-koru.MP3" type="audio/mpeg">
     Tarayıcınız ses oynatmayı desteklemiyor.
   </audio>
