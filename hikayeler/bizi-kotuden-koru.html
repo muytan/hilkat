@@ -7,113 +7,238 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root{ --bg:#000; --fg:#f0f0f0; --red:#a30000; }
-*{box-sizing:border-box}
-body{
-  background:var(--bg); color:var(--fg);
-  font-family:"Rubik",sans-serif; line-height:1.7;
-  margin:0; padding:30px 20px; max-width:760px; margin-inline:auto;
+:root{
+  --bg:#000000;
+  --fg:#f0f0f0;
+  --muted:#b9b9b9;
+  --red:#c41e3a;          /* daha canlı kırmızı */
+  --red-dark:#7c0f22;
+  --panel:#0b0b0b;
+  --ease:cubic-bezier(.2,.6,.2,1);
 }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--fg);
+  font-family:"Rubik",sans-serif;
+  line-height:1.78;
+  background:
+    radial-gradient(1200px 600px at 50% 0%, #1a0a0f 0%, #0b0507 45%, #050305 70%, #000 100%),
+    var(--bg);
+  position:relative;
+  overflow-y:overlay;
+}
+
+/* Vignette */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  box-shadow:inset 0 0 200px 80px rgba(0,0,0,.9);
+  z-index:0;
+}
+
+/* Custom scrollbar */
+/* Chrome/Edge/Safari */
+::-webkit-scrollbar{width:12px}
+::-webkit-scrollbar-track{background:#0a0a0a}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(#7c0f22,#c41e3a);
+  border:3px solid #0a0a0a; border-radius:10px;
+  box-shadow:0 0 12px rgba(196,30,58,.35);
+}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(#8f1228,#e11c3f)}
+/* Firefox */
+*{scrollbar-width:thin; scrollbar-color:#c41e3a #0a0a0a}
+
+.wrapper{max-width:820px;margin:0 auto;padding:34px 20px 90px;position:relative;z-index:1}
+
+/* Back link with slide-left hover */
+a.back{
+  display:inline-block;color:var(--muted);text-decoration:none;
+  transform:translateX(0); transition:color .25s var(--ease), transform .25s var(--ease);
+  margin-bottom:12px;
+}
+a.back:hover{color:var(--fg); transform:translateX(-6px)}
+
+/* Title with pulsing red glow */
 h1.story-title{
   font-family:"Syne",sans-serif; font-weight:800;
-  font-size:clamp(32px,5vw,44px); text-align:center; margin:0 0 12px;
+  font-size:clamp(32px,5vw,48px); text-align:center; margin:6px 0 18px;
+  letter-spacing:.02em;
+  color:#fff; text-shadow:0 0 0 transparent;
+  animation:titlePulse 4.5s ease-in-out infinite;
 }
-p{ margin:12px 0; }
+@keyframes titlePulse{
+  0%,60%{ text-shadow:0 0 0 rgba(196,30,58,0) }
+  70%{   text-shadow:0 0 10px rgba(196,30,58,.45), 0 0 24px rgba(196,30,58,.25) }
+  86%{   text-shadow:0 0 18px rgba(196,30,58,.7),  0 0 44px rgba(196,30,58,.35) }
+  100%{  text-shadow:0 0 0 rgba(196,30,58,0) }
+}
 
-/* medya eylemleri */
-.media-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:24px 0}
+/* Better spacing */
+p{ margin:14px 0; }
+
+/* Flicker effect for italic text */
+em,i{
+  font-style:italic;
+  animation:flicker 5.5s steps(40,end) infinite;
+}
+@keyframes flicker{
+  0%,4%,8%,12%,20%,100%{ opacity:1 }
+  2%,6%,10%,18%{ opacity:.72 }
+  14%{ opacity:.4 }
+}
+
+/* Staggered fade-in for paragraphs */
+.reveal{opacity:0; transform:translateY(12px); filter:blur(4px)}
+.reveal.in{opacity:1; transform:none; filter:none; transition:.7s var(--ease)}
+
+/* Media actions */
+.media-actions{
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:26px 0 8px;
+}
 .media-btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:10px 18px;border-radius:10px;border:2px solid var(--red);
-  color:var(--fg);background:transparent;font-weight:600;letter-spacing:.05em;
-  cursor:pointer;transition:.25s;
+  position:relative; overflow:hidden;
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:8px;
+  padding:11px 18px; border-radius:14px;
+  color:#fff; text-decoration:none; font-weight:700; letter-spacing:.06em;
+  border:1.8px solid var(--red); background:rgba(12,12,12,.4);
+  backdrop-filter:blur(6px);
+  transition:transform .25s var(--ease), border-color .25s var(--ease);
 }
-.media-btn:hover{background:var(--red);color:#000}
+.media-btn:hover{ transform:translateY(-1px); border-color:#e11c3f }
 
-#mediaError{display:none;margin:8px 0 0;color:#f88;font-weight:700}
+/* Expanding circle fill on hover */
+.media-btn::after{
+  content:""; position:absolute; inset:auto; left:50%; top:50%;
+  width:0; height:0; border-radius:999px; background:var(--red);
+  transform:translate(-50%,-50%); opacity:.14; transition:width .45s var(--ease), height .45s var(--ease), opacity .45s var(--ease);
+}
+.media-btn:hover::after{ width:260px; height:260px; opacity:.22 }
 
-/* playerlar */
-.media-player{display:none;margin-top:16px}
+/* Players with subtle breathing pulse */
+.media-player{display:none; margin-top:16px}
 .media-player.active{display:block}
-.dark-audio{
-  width:100%;height:60px;border-radius:10px;background:#111;color:#fff;
-  border:2px solid var(--red); box-shadow:0 0 15px rgba(163,0,0,.3);
-}
-audio::-webkit-media-controls-panel{background:#111;color:#fff}
-audio::-webkit-media-controls-play-button,
-audio::-webkit-media-controls-timeline,
-audio::-webkit-media-controls-current-time-display,
-audio::-webkit-media-controls-time-remaining-display{filter:invert(1)}
-
-video{
-  width:100%;outline:none;border-radius:10px;background:#111;
-  border:2px solid var(--red); box-shadow:0 0 15px rgba(163,0,0,.3);
+.pulse{animation:pulse 6s ease-in-out infinite}
+@keyframes pulse{
+  0%,100%{ box-shadow:0 0 0 rgba(196,30,58,0) }
+  50%{    box-shadow:0 0 22px rgba(196,30,58,.25) }
 }
 
-footer{ text-align:center; opacity:.7; font-size:14px; margin-top:40px; }
-a.back{display:inline-block;margin-bottom:14px;color:var(--fg);opacity:.7;text-decoration:none}
-a.back:hover{opacity:1}
+audio,video{
+  width:100%; border-radius:14px; outline:none; background:#0e0e0e;
+  border:2px solid var(--red-dark);
+}
+
+/* Dark audio tweaks (WebKit) */
+audio.dark::-webkit-media-controls-panel{ background:#0e0e0e }
+audio.dark::-webkit-media-controls-play-button,
+audio.dark::-webkit-media-controls-timeline,
+audio.dark::-webkit-media-controls-current-time-display,
+audio.dark::-webkit-media-controls-time-remaining-display{ filter:invert(1) }
+
+/* Error box styled */
+#mediaError{
+  display:none; margin:10px auto 0; max-width:720px;
+  background:linear-gradient(180deg, rgba(196,30,58,.1), rgba(124,15,34,.1));
+  border:1.5px solid var(--red-dark); color:#ffb3c1;
+  padding:10px 14px; border-radius:12px;
+}
+
+/* Footer */
+footer{ text-align:center; opacity:.7; font-size:14px; margin-top:44px }
 </style>
 </head>
 <body>
 
-<a href="/" class="back">← Ana sayfa</a>
-<h1 class="story-title">BİZİ KÖTÜDEN KORU</h1>
+<div class="wrapper">
 
-<p>“Sayın Yargıç Erkan Cantay!” Yargıç içeri girdiğinde herkes ayağa kalktı. Bir tek o kalkmadı. Avukatı dirseğiyle dürttü ama adam kıpırdamadı, başını hafifçe yana eğdi. Yargıç gözlüğünün üzerinden baktı, sesini yükseltti.</p>
-<p>“Sanık ayağa kalksın.”</p>
-<p>Adam yavaşça başını kaldırdı. Gözleri donuktu, boş bir derinliğe bakar gibiydi. Bir uğultu yayıldı salondan. Kimse bir şey söylemedi, ama herkesin içinde aynı rahatsızlık vardı. Yargıç istemsizce yutkundu.</p>
-<p>“Dosyada yüzlerce sayfa var, ama hiçbirinde neden yaptığını yazmıyor,” dedi. “Anlat bakalım, neden?”</p>
-<p>Adam başını yana eğdi, dudaklarının kenarı belli belirsiz kıvrıldı. “Kızınızın gözleri de böyleydi.”</p>
-<p>Yargıç yerinde dondu. Salondaki hava bir anda ağırlaştı. Kalemi elinden düştü, tok bir sesle masaya çarptı. “Ne dedin sen?”</p>
-<p>Adam başını kaldırdı. “Elif. Öyle demişti. Bizi kötüden koru.”</p>
-<p>Bir uğultu daha geçti, ama bu kez dışarıdan değil içeriden geliyordu, sanki binanın duvarları nefes alıyordu. Yargıç yerinden kalktı. “Duruşmaya ara veriyorum. Herkes dışarı.”</p>
-<p>Kapılar kapandı. Salonda sadece ikisi kaldı.</p>
-<p>Yargıç derin bir nefes aldı. “Kızımı nereden tanıyorsun?”</p>
-<p>Adam gözlerini ona dikti. “Tanımıyorum. Ama o beni çağırdı.”</p>
-<p>Yargıç bir adım geri çekildi. “Ne saçmalıyorsun sen?”</p>
-<p>Adamın yüzündeki gülümseme genişledi. “Her gece dua ediyordu. Sizi de duyuyordum. Siz unuttunuz ama o unutmadı.”</p>
-<p>Işıklar titredi, sonra söndü. Karanlıkta zincirlerin sesi yankılandı. Yargıç telefonunu çıkardı, el fenerini açmak istedi. Ekranda bir mesaj belirdi:</p>
-<p><em>Elif: “Baba, merak etme. Eve geldim.”</em></p>
-<p>Tam o anda karşısındaki adam doğruldu. Zincirleri yere düşmüştü. Yavaşça dilini dışarı çıkardı; siyah, ıslak, canlı bir şeydi o. “Endişelenmeyin Yargıç. Kızınız artık korkmuyor.”</p>
-<p>Yargıç geri çekilmek istedi, ama dizleri titredi. “Ne yaptın ona?”</p>
-<p>“Ben değil,” dedi adam. “Siz yaptınız. O beni çağırdı, ben sadece geldim.”</p>
-<p>O sırada mahkeme salonunun kapısı arkasından bir ses duyuldu. Tırnak sesi gibi, yavaş yavaş yaklaşan bir sürünme. Yargıç gözlerini kapıya dikti. Kapının altından sızan bir gölge büyüdü, büyüdü, sonunda ayağa kalktı.</p>
-<p>Elif’in sesi duyuldu, kısık ama tanıdık. “Baba, dua etmeyi neden bıraktın?”</p>
-<p>Kapı aralandı. Hiç kimse yoktu. Sadece içeri dolan rüzgârla, duvarın üzerine yazılmış bir cümle belirdi:</p>
-<p><strong>Bizi kötüden koru.</strong></p>
-<p>Ve Yargıç o an fark etti. Telefon hâlâ elindeydi. Ama ekranında kendi sesi yankılanıyordu. “Elif…” dedi titreyerek. Fısıltı cevabı verdi:</p>
-<p><em>“Artık ben koruyorum.”</em></p>
+  <a href="/" class="back">← Ana sayfa</a>
+  <h1 class="story-title">BİZİ KÖTÜDEN KORU</h1>
 
-<div class="media-actions">
-  <button id="btnListen" class="media-btn">Hikâyeyi Dinle</button>
-  <button id="btnWatch"  class="media-btn">Hikâyeyi İzle</button>
-  <a class="media-btn" href="/media/bizi-kotuden-koru.MP3" download>MP3 İndir</a>
+  <!-- HİKÂYE (değiştirmeden bıraktım) -->
+  <p class="reveal">“Sayın Yargıç Erkan Cantay!” Yargıç içeri girdiğinde herkes ayağa kalktı. Bir tek o kalkmadı. Avukatı dirseğiyle dürttü ama adam kıpırdamadı, başını hafifçe yana eğdi. Yargıç gözlüğünün üzerinden baktı, sesini yükseltti.</p>
+  <p class="reveal">“Sanık ayağa kalksın.”</p>
+  <p class="reveal">Adam yavaşça başını kaldırdı. Gözleri donuktu, boş bir derinliğe bakar gibiydi. Bir uğultu yayıldı salondan. Kimse bir şey söylemedi, ama herkesin içinde aynı rahatsızlık vardı. Yargıç istemsizce yutkundu.</p>
+  <p class="reveal">“Dosyada yüzlerce sayfa var, ama hiçbirinde neden yaptığını yazmıyor,” dedi. “Anlat bakalım, neden?”</p>
+  <p class="reveal">Adam başını yana eğdi, dudaklarının kenarı belli belirsiz kıvrıldı. “Kızınızın gözleri de böyleydi.”</p>
+  <p class="reveal">Yargıç yerinde dondu. Salondaki hava bir anda ağırlaştı. Kalemi elinden düştü, tok bir sesle masaya çarptı. “Ne dedin sen?”</p>
+  <p class="reveal">Adam başını kaldırdı. “Elif. Öyle demişti. <em>Bizi kötüden koru.</em>”</p>
+  <p class="reveal">Bir uğultu daha geçti, ama bu kez dışarıdan değil içeriden geliyordu, sanki binanın duvarları nefes alıyordu. Yargıç yerinden kalktı. “Duruşmaya ara veriyorum. Herkes dışarı.”</p>
+  <p class="reveal">Kapılar kapandı. Salonda sadece ikisi kaldı.</p>
+  <p class="reveal">Yargıç derin bir nefes aldı. “Kızımı nereden tanıyorsun?”</p>
+  <p class="reveal">Adam gözlerini ona dikti. “Tanımıyorum. Ama o beni çağırdı.”</p>
+  <p class="reveal">Yargıç bir adım geri çekildi. “Ne saçmalıyorsun sen?”</p>
+  <p class="reveal">Adamın yüzündeki gülümseme genişledi. “Her gece dua ediyordu. Sizi de duyuyordum. Siz unuttunuz ama o unutmadı.”</p>
+  <p class="reveal">Işıklar titredi, sonra söndü. Karanlıkta zincirlerin sesi yankılandı. Yargıç telefonunu çıkardı, el fenerini açmak istedi. Ekranda bir mesaj belirdi:</p>
+  <p class="reveal"><em>Elif: “Baba, merak etme. Eve geldim.”</em></p>
+  <p class="reveal">Tam o anda karşısındaki adam doğruldu. Zincirleri yere düşmüştü. Yavaşça dilini dışarı çıkardı; siyah, ıslak, canlı bir şeydi o. “Endişelenmeyin Yargıç. Kızınız artık korkmuyor.”</p>
+  <p class="reveal">Yargıç geri çekilmek istedi, ama dizleri titredi. “Ne yaptın ona?”</p>
+  <p class="reveal">“Ben değil,” dedi adam. “Siz yaptınız. O beni çağırdı, ben sadece geldim.”</p>
+  <p class="reveal">O sırada mahkeme salonunun kapısı arkasından bir ses duyuldu. Tırnak sesi gibi, yavaş yavaş yaklaşan bir sürünme. Yargıç gözlerini kapıya dikti. Kapının altından sızan bir gölge büyüdü, büyüdü, sonunda ayağa kalktı.</p>
+  <p class="reveal">Elif’in sesi duyuldu, kısık ama tanıdık. “Baba, dua etmeyi neden bıraktın?”</p>
+  <p class="reveal">Kapı aralandı. Hiç kimse yoktu. Sadece içeri dolan rüzgârla, duvarın üzerine yazılmış bir cümle belirdi:</p>
+  <p class="reveal"><strong>Bizi kötüden koru.</strong></p>
+  <p class="reveal">Ve Yargıç o an fark etti. Telefon hâlâ elindeydi. Ama ekranında kendi sesi yankılanıyordu. “Elif…” dedi titreyerek. Fısıltı cevabı verdi:</p>
+  <p class="reveal"><em>“Artık ben koruyorum.”</em></p>
+
+  <!-- Actions -->
+  <div class="media-actions">
+    <button id="btnListen" class="media-btn">Hikâyeyi Dinle</button>
+    <button id="btnWatch"  class="media-btn">Hikâyeyi İzle</button>
+    <a class="media-btn" id="btnShare">Paylaş</a>
+    <a class="media-btn" id="btnSpotify" target="_blank" rel="noopener" href="https://open.spotify.com/episode/XXXXXXXX">
+      Spotify’da Dinle
+    </a>
+    <a class="media-btn" href="/media/bizi-kotuden-koru.MP3" download>MP3 İndir</a>
+  </div>
+
+  <div id="mediaError"></div>
+
+  <div id="playerAudio" class="media-player">
+    <audio id="audioEl" class="dark pulse dark-audio" controls preload="metadata" crossorigin="anonymous">
+      <source src="/media/bizi-kotuden-koru.MP3" type="audio/mpeg">
+      <source src="/media/bizi-kotuden-koru.mp3" type="audio/mpeg">
+      Tarayıcınız ses oynatmayı desteklemiyor.
+    </audio>
+  </div>
+
+  <div id="playerVideo" class="media-player">
+    <video id="videoEl" class="pulse" controls preload="metadata" poster="/media/bkk-poster.jpg" crossorigin="anonymous">
+      <source src="/media/bizi-kotuden-koru.mp4" type="video/mp4">
+      Tarayıcınız video oynatmayı desteklemiyor.
+    </video>
+  </div>
+
+  <footer>© 2025 tan</footer>
 </div>
-
-<div id="mediaError"></div>
-
-<div id="playerAudio" class="media-player">
-  <audio id="audioEl" class="dark-audio" controls preload="metadata" crossorigin="anonymous">
-    <source src="/media/bizi-kotuden-koru.MP3" type="audio/mpeg">
-    <source src="/media/bizi-kotuden-koru.mp3" type="audio/mpeg">
-    Tarayıcınız ses oynatmayı desteklemiyor.
-  </audio>
-</div>
-
-<div id="playerVideo" class="media-player">
-  <video id="videoEl" controls preload="metadata" poster="/media/bkk-poster.jpg" crossorigin="anonymous">
-    <source src="/media/bizi-kotuden-koru.mp4" type="video/mp4">
-    Tarayıcınız video oynatmayı desteklemiyor.
-  </video>
-</div>
-
-<footer>© 2025 tan</footer>
 
 <script>
+/* Paragraph stagger on view */
+(function(){
+  const els=[...document.querySelectorAll('.reveal')];
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        const i=els.indexOf(en.target);
+        en.target.style.transitionDelay = (i*70)+'ms';
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      }
+    });
+  },{threshold:.1});
+  els.forEach(e=>io.observe(e));
+})();
+
+/* Players + share */
 (function(){
   const btnListen = document.getElementById('btnListen');
   const btnWatch  = document.getElementById('btnWatch');
+  const btnShare  = document.getElementById('btnShare');
   const aWrap     = document.getElementById('playerAudio');
   const vWrap     = document.getElementById('playerVideo');
   const audio     = document.getElementById('audioEl');
@@ -127,24 +252,31 @@ a.back:hover{opacity:1}
 
   function wireErrors(el,label){
     el.addEventListener('error', () => {
-      const s = (el.error && el.error.message) ? el.error.message : 'yüklenemedi';
-      msg(label + ' ' + s + '. Dosya yolu: ../media/...  Uzantı ve codec’i kontrol et.');
+      const s=(el.error && el.error.message)?el.error.message:'yüklenemedi';
+      msg(label+' '+s+' • Yol ve uzantıyı kontrol et.');
     });
     el.querySelectorAll('source').forEach(src=>{
-      src.addEventListener('error', ()=> msg(label + ' kaynağı bulunamadı: ' + src.getAttribute('src')));
+      src.addEventListener('error',()=> msg(label+' kaynağı bulunamadı: '+src.getAttribute('src')));
     });
     el.addEventListener('loadeddata', clearMsg);
   }
   wireErrors(audio,'Ses dosyası');
   wireErrors(video,'Video dosyası');
 
-  btnListen.addEventListener('click', () => {
-    show(aWrap); hide(vWrap);
-    try{ video.pause(); }catch(_){}
-  });
-  btnWatch.addEventListener('click', () => {
-    show(vWrap); hide(aWrap);
-    try{ audio.pause(); }catch(_){}
+  btnListen.addEventListener('click', ()=>{ show(aWrap); hide(vWrap); try{video.pause();}catch(_){} });
+  btnWatch .addEventListener('click', ()=>{ show(vWrap); hide(aWrap); try{audio.pause();}catch(_){} });
+
+  // Share
+  btnShare.addEventListener('click', async ()=>{
+    const data={ title:'BİZİ KÖTÜDEN KORU', text:'Hilkat Garibesi – Bizi Kötüden Koru', url: location.href };
+    try{
+      if(navigator.share){ await navigator.share(data); }
+      else{
+        await navigator.clipboard.writeText(location.href);
+        msg('Bağlantı panoya kopyalandı.');
+        setTimeout(clearMsg,1800);
+      }
+    }catch(_){}
   });
 
   // Başlangıçta gizli
