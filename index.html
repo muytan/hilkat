@@ -13,7 +13,7 @@
 <!-- Rubik display variants -->
 <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=Rubik+Bubbles&family=Rubik+Moonrocks&family=Rubik+Dirt&family=Rubik+Doodle+Shadow&family=Rubik+Iso&family=Rubik+Wet+Paint&family=Rubik+Distressed&family=Rubik+Gemstones&family=Rubik+Beastly&family=Rubik+Puddles&family=Rubik+Microbe&family=Rubik+80s+Fade&family=Rubik+Marker+Hatch&family=Rubik+Pixels&family=Rubik+Storm&family=Rubik+Maze&display=swap" rel="stylesheet">
 
-<!-- Non-Rubik contrast fonts (subtitle rotation kept exactly as before) -->
+<!-- Contrast fonts (kept) -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Courier+Prime:wght@400;700&family=Oswald:wght@500&family=Cinzel:wght@700&display=swap" rel="stylesheet">
 
 <style>
@@ -52,11 +52,15 @@ html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Rubik,sys
   -webkit-text-stroke-width:3px; -webkit-text-stroke-color:var(--red);
 }
 
-/* Subtitle (meaning) — vertical stack with rotating fonts (unchanged) */
-.meaning{margin-top:6px; transform:translateY(-6px); color:#e6e6e6; opacity:.34; font-size:clamp(14px,2.8vw,18px); text-align:center; letter-spacing:.02em}
-.meaning-stack{display:flex; flex-direction:column; align-items:center; gap:2px}
-.mword{display:block; line-height:1.2; transition:opacity .12s ease, transform .12s ease, filter .12s ease}
+/* ===== ONLY THIS AREA WAS UPDATED (subtitle canvas) ===== */
+.meaning{
+  margin-top:6px; transform:translateY(-6px);
+  width:min(92vw,960px); margin-inline:auto;
+}
+.meaning-box{ position:relative; width:100%; }
+#meaningCanvas{ position:relative; display:block; width:100%; height:auto; max-width:100%; background:transparent; }
 
+/* Divider + story layout */
 .hr-red{height:1px;background:linear-gradient(90deg,transparent,var(--red) 40%,transparent);margin:16px 0 28px;border:0}
 .weekly{font-family:"Instrument Serif",Georgia,serif; font-size:clamp(22px,3vw,28px); letter-spacing:.04em; text-align:center; margin:26px 0 8px}
 
@@ -94,8 +98,12 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
     <div class="tp-wrap" id="tpContainer" aria-label="HİLKAT GARİBESİ">
       <h1 class="tp-title stroke" id="tpTitle"></h1>
     </div>
+
+    <!-- UPDATED: subtitle canvas -->
     <div class="meaning">
-      <div class="meaning-stack" id="meaningStack">Kendisinde doğuştan normal olmayan gariplikler bulunan kimse</div>
+      <div class="meaning-box">
+        <canvas id="meaningCanvas"></canvas>
+      </div>
     </div>
   </div>
 </section>
@@ -113,9 +121,10 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
     <p class="sr-text">Sanığa bakıyordu, bu kadar nefreti belki de hayatı boyunca hissetmemişti.</p>
     <p class="sr-text">Kızına ne kadar sevgi duyuyorsa ve kızı için nasıl her şeyi yapabilecekse; karşındaki seri katile de o kadar büyük ve derin bir nefret duyuyordu.</p>
 
-<a class="btn" href="/hikayeler/bizi-kotuden-koru.html">
-  <span class="glow-text">DEVAMINI OKU</span>
-</a>  </article>
+    <a class="btn" href="/hikayeler/bizi-kotuden-koru.html">
+      <span class="glow-text">DEVAMINI OKU</span>
+    </a>
+  </article>
 
   <div class="scroll-spacer"></div>
 
@@ -127,7 +136,7 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
 <script>
-/* Title spans + desktop pointer-pressure; mobile uses decrypt effect */
+/* Title: mobile decrypt / desktop pressure (unchanged) */
 (function(){
   const TITLE_TEXT = "HİLKAT GARİBESİ";
   const container = document.getElementById('tpContainer');
@@ -135,7 +144,6 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
   title.textContent = "";
   const chars = [...TITLE_TEXT];
 
-  // build spans
   chars.forEach((ch,i)=>{
     const s=document.createElement('span');
     s.dataset.char=ch; s.textContent=ch;
@@ -143,7 +151,6 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
     title.appendChild(s);
   });
 
-  // size
   function setSize(){
     const {width} = container.getBoundingClientRect();
     let fz = width / (chars.length / 2);
@@ -156,21 +163,16 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (isMobile && !reduceMotion) {
-    // MOBILE: Decrypt/Scramble reveal (no hover, auto on view)
     const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};:,.<>?/\\|~`░▒▓█▌▐#¤¢£¥§¶†‡∆ΩΨΣΦΘΞΛζψøæπµ";
     const spans = Array.from(title.querySelectorAll('span'));
     let revealed = new Set();
-    let iter = 0;
-    const maxIterations = 120;
-    const speed = 130; // ms
-    const sequential = true;
-    const revealDirection = "center"; // start | end | center
+    const speed = 130;
+    const revealDirection = "center";
 
     function nextIndex(set){
       const n = spans.length;
       if (revealDirection === "start") return set.size;
       if (revealDirection === "end") return n - 1 - set.size;
-      // center
       const mid = Math.floor(n/2);
       const off = Math.floor(set.size/2);
       const idx = set.size % 2 === 0 ? mid + off : mid - off - 1;
@@ -180,37 +182,21 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
     }
 
     function tick(){
-      if (sequential) {
-        if (revealed.size < spans.length) {
-          const ni = nextIndex(revealed);
-          revealed.add(ni);
-        } else {
-          clearInterval(timer);
-          // ensure original text at end
-          spans.forEach((sp,i)=>{ sp.textContent = chars[i]; });
-          return;
-        }
-        // scramble unrevealed
-        spans.forEach((sp,i)=>{
-          if (chars[i] === " ") return;
-          if (revealed.has(i)) sp.textContent = chars[i];
-          else sp.textContent = LETTERS[Math.floor(Math.random()*LETTERS.length)];
-        });
+      if (revealed.size < spans.length) {
+        const ni = nextIndex(revealed);
+        revealed.add(ni);
       } else {
-        // non-sequential flicker mode
-        if (iter++ >= maxIterations) {
-          clearInterval(timer);
-          spans.forEach((sp,i)=> sp.textContent = chars[i]);
-          return;
-        }
-        spans.forEach((sp,i)=>{
-          if (chars[i] === " ") return;
-          sp.textContent = LETTERS[Math.floor(Math.random()*LETTERS.length)];
-        });
+        clearInterval(timer);
+        spans.forEach((sp,i)=>{ sp.textContent = chars[i]; });
+        return;
       }
+      spans.forEach((sp,i)=>{
+        if (chars[i] === " ") return;
+        if (revealed.has(i)) sp.textContent = chars[i];
+        else sp.textContent = LETTERS[Math.floor(Math.random()*LETTERS.length)];
+      });
     }
 
-    // Run when hero enters view once
     const io = new IntersectionObserver(entries=>{
       entries.forEach(en=>{
         if (en.isIntersecting){
@@ -223,7 +209,6 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
     io.observe(container);
 
   } else {
-    // DESKTOP: interactive pressure
     const mouse={x:0,y:0}, cursor={x:0,y:0};
     addEventListener('mousemove', e=>{cursor.x=e.clientX;cursor.y=e.clientY},{passive:true});
     addEventListener('touchmove', e=>{const t=e.touches[0];cursor.x=t.clientX;cursor.y=t.clientY},{passive:true});
@@ -268,77 +253,181 @@ footer{color:#8a8a8a; font-size:12px; padding:36px 0 64px; text-align:center}
     gsap.fromTo(words,{filter:'blur(8px)'},{filter:'blur(0px)',ease:'none',stagger:0.02,scrollTrigger:cfg});
   });
 })();
+</script>
 
-/* Meaning rotation (unchanged, jitter-free) */
-(async function(){
-  const FONTS = [
-    '"Rubik Glitch", cursive',
-    '"Playfair Display", serif',
-    '"Rubik Bubbles", cursive',
-    '"Courier Prime", monospace',
-    '"Rubik Dirt", cursive',
-    '"Oswald", sans-serif',
-    '"Rubik Iso", cursive',
-    '"Cinzel", serif',
-    '"Rubik Wet Paint", cursive',
-    '"Rubik Pixels", cursive',
-    '"Rubik Maze", cursive',
-    '"Rubik Marker Hatch", cursive',
-    '"Rubik 80s Fade", cursive',
-    '"Rubik Mono One", sans-serif',
-    '"Rubik Distressed", cursive',
-    '"Rubik Gemstones", cursive',
-    '"Rubik Beastly", cursive',
-    '"Rubik Puddles", cursive',
-    '"Rubik Microbe", cursive',
-    '"Rubik Moonrocks", cursive',
-    '"Rubik", sans-serif'
+<!-- ===== Subtitle WebGL shader (Y-flip FIXED) ===== -->
+<script>
+(function(){
+  const lines = [
+    "Kendisinde",
+    "doğuştan",
+    "normal",
+    "olmayan",
+    "gariplikler",
+    "bulunan",
+    "kimse"
   ];
+  const holder = document.querySelector('.meaning-box');
+  const canvas = document.getElementById('meaningCanvas');
+  const gl = canvas.getContext('webgl');
+  if(!gl){ return; }
 
-  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(_){} }
+  /* ---- layout (text mask) ---- */
+  const tCan = document.createElement('canvas');
+  const tctx = tCan.getContext('2d');
 
-  const stack = document.getElementById('meaningStack');
-  const words = stack.textContent.trim().split(' ').filter(Boolean);
-  stack.innerHTML = words.map(w=>`<span class="mword">${w}</span>`).join('');
+  function drawMask(){
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const rect = holder.getBoundingClientRect();
+    const W = Math.max(10, Math.floor(rect.width * dpr));
+    let fontSize = Math.max(18, Math.min(96, Math.floor(rect.width * 0.12)));
+    tctx.font = `800 ${fontSize}px "Syne", system-ui, sans-serif`;
+    const longest = lines.reduce((a,b)=> a.length>b.length?a:b, "");
+    let w = tctx.measureText(longest).width;
+    if (w > W*0.9){
+      fontSize = Math.floor(fontSize * (W*0.9 / w));
+      tctx.font = `800 ${fontSize}px "Syne", system-ui, sans-serif`;
+    }
+    const lineH = Math.floor(fontSize * 1.06);
+    const totalH = lineH * lines.length;
+    const H = Math.max(totalH, lineH);
 
-  const els = Array.from(stack.querySelectorAll('.mword'));
-  const meas = document.createElement('span');
-  meas.style.position='absolute'; meas.style.left='-9999px'; meas.style.top='-9999px'; meas.style.visibility='hidden';
-  document.body.appendChild(meas);
+    tCan.width = W;
+    tCan.height = H;
 
-  els.forEach(el=>{
-    const word = el.textContent;
-    let maxW = 0, maxH = 0;
-    FONTS.forEach(ff=>{
-      meas.style.fontFamily = ff;
-      meas.style.fontSize = getComputedStyle(stack).fontSize;
-      meas.style.lineHeight = '1.2';
-      meas.textContent = word;
-      const r = meas.getBoundingClientRect();
-      if (r.width > maxW)  maxW = r.width;
-      if (r.height > maxH) maxH = r.height;
-    });
-    el.style.display = 'inline-block';
-    el.style.width  = Math.ceil(maxW) + 'px';
-    el.style.height = Math.ceil(maxH) + 'px';
-    el.style.lineHeight = Math.ceil(maxH) + 'px';
-    el.style.fontFamily = FONTS[0];
-  });
-  meas.remove();
+    canvas.width = W;
+    canvas.height = H;
+    holder.style.height = Math.ceil(H / dpr) + 'px';
+    canvas.style.height = Math.ceil(H / dpr) + 'px';
 
-  let i = 0;
-  function tick(){
-    i = (i + 1) % FONTS.length;
-    els.forEach((el, idx)=>{
-      setTimeout(()=>{
-        el.style.opacity = .5; el.style.transform='translateY(-2px)'; el.style.filter='blur(2px)';
-        setTimeout(()=>{ el.style.fontFamily = FONTS[i]; el.style.opacity=''; el.style.transform=''; el.style.filter=''; }, 120);
-      }, idx * 80);
+    tctx.clearRect(0,0,W,H);
+    tctx.textAlign='center';
+    tctx.textBaseline='middle';
+    tctx.fillStyle='#000'; // glyphs opaque (alpha=1), background transparent
+    let y = H/2 - totalH/2 + lineH/2;
+    lines.forEach(line=>{
+      tctx.font = `800 ${fontSize}px "Syne", system-ui, sans-serif`;
+      tctx.fillText(line, W/2, y);
+      y += lineH;
     });
   }
-  setTimeout(tick, 1200);
-  setInterval(tick, 2000);
+  drawMask();
+
+  /* ---- WebGL ---- */
+  const VS = `
+    attribute vec2 aPos;
+    varying vec2 vUv;
+    void main(){ vUv=aPos*0.5+0.5; gl_Position=vec4(aPos,0.0,1.0); }
+  `;
+  const FS = `
+    precision highp float;
+    varying vec2 vUv;
+
+    uniform float uTime;
+    uniform vec2  uRes;
+    uniform sampler2D uText;
+    uniform vec3  uRed;
+    uniform float uNoiseAmt, uSpeed, uScale, uRot;
+
+    const float E = 2.71828182845904523536;
+    float noise(vec2 p){ vec2 r = E * sin(E * p); return fract(r.x * r.y * (1.0 + p.x)); }
+    vec2 rotate(vec2 uv, float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c)*uv; }
+
+    void main(){
+      vec2 uv = vUv;
+      uv -= 0.5;
+      uv.x *= uRes.x/uRes.y;
+      uv = rotate(uv, uRot);
+      uv *= uScale;
+      uv += 0.5;
+
+      float t = uTime * uSpeed;
+
+      vec2 tex = uv;
+      tex.y += 0.040 * sin(8.0 * tex.x - t);
+      tex.x += 0.026 * sin(4.5 * tex.y + 0.6 * t);
+
+      float bands = 0.58 + 0.42 * sin(5.0 * (tex.x + tex.y
+                    + cos(3.0 * tex.x + 5.0 * tex.y) + 0.02 * t)
+                    + sin(20.0 * (tex.x + tex.y - 0.10 * t)));
+
+      float n = noise(gl_FragCoord.xy * 1.2 + t * 0.35);
+      vec3 curtain = uRed * bands - vec3(n) * (uNoiseAmt * 0.12);
+
+      /* Y-FLIP FIX: sample mask with flipped Y so text is not reversed */
+      float a = texture2D(uText, vec2(vUv.x, 1.0 - vUv.y)).a;
+
+      float gain = 0.65 + 0.35 * smoothstep(0.50, 0.80, bands);
+      vec3 ink = curtain * gain;
+
+      vec3 finalCol = ink * a;   // only inside glyphs
+      gl_FragColor = vec4(finalCol, 1.0);
+    }
+  `;
+  function sh(t,src){const s=gl.createShader(t); gl.shaderSource(s,src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); return s;}
+  const prog=gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER,VS));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER,FS));
+  gl.linkProgram(prog); gl.useProgram(prog);
+
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]),gl.STATIC_DRAW);
+  const aPos=gl.getAttribLocation(prog,'aPos'); gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
+
+  const uTime = gl.getUniformLocation(prog,'uTime');
+  const uRes  = gl.getUniformLocation(prog,'uRes');
+  const uText = gl.getUniformLocation(prog,'uText');
+  const uRed  = gl.getUniformLocation(prog,'uRed');
+  const uNoise= gl.getUniformLocation(prog,'uNoiseAmt');
+  const uSpeed= gl.getUniformLocation(prog,'uSpeed');
+  const uScale= gl.getUniformLocation(prog,'uScale');
+  const uRot  = gl.getUniformLocation(prog,'uRot');
+
+  /* your requested uniforms */
+  gl.uniform3fv(uRed,[0xC4/180,0x1E/255,0x3A/255]); // #c41e3a scaled
+  gl.uniform1f(uNoise,5.2);
+  gl.uniform1f(uSpeed,0.80);
+  gl.uniform1f(uScale,0.2);
+  gl.uniform1f(uRot,-.08);
+  gl.uniform2f(uRes, canvas.width, canvas.height);
+
+  /* upload text mask */
+  const tex=gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  function upload(){ gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,tCan);
+    gl.uniform1i(uText, 0);
+  }
+  upload();
+
+  function onResize(){
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const r = holder.getBoundingClientRect();
+    canvas.width  = Math.max(10, Math.floor(r.width * dpr));
+    canvas.height = canvas.height || 1; // keep last height; drawMask sets it
+    drawMask(); upload();
+    gl.viewport(0,0,canvas.width,canvas.height);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+  }
+  window.addEventListener('resize', onResize, {passive:true});
+  onResize();
+
+  let t0=performance.now();
+  (function loop(now){
+    gl.uniform1f(uTime,(now-t0)*0.001);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    requestAnimationFrame(loop);
+  })(t0);
 })();
 </script>
+<!-- ===== /subtitle shader ===== -->
+
 </body>
 </html>
